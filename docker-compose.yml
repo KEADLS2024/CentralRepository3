@@ -1,0 +1,83 @@
+version: '3.8'
+
+services:
+  order-app:
+    build:
+      context: ./OrderService
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=centralrepository3-order-db-1;Database=OrderServiceDB;User=sa;Password=Qwerty123!;TrustServerCertificate=True;
+    networks:
+      - app-network
+  order-db:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      SA_PASSWORD: "Qwerty123!"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
+    volumes:
+      - db_data:/var/opt/mssql
+      - ./OrderService/init.sql:/docker-entrypoint-initdb.d/init.sql
+    command:
+      - /bin/bash
+      - -c
+      - |
+        /opt/mssql/bin/sqlservr & sleep 30 && /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P 'Qwerty123!' -d master -i /docker-entrypoint-initdb.d/init.sql
+        wait
+    networks:
+      - app-network
+  catalog-app:
+    build:
+      context: ./DLS_Catalog_Service_3.0/DLS_Catalog_Service_3.0
+      dockerfile: Dockerfile
+    ports:
+      - "8070:80"
+      - "8443:7026"
+    depends_on:
+      - mymongodb
+      - rabbitmq
+    networks:
+      - app-network
+    environment:
+      - AllowedHosts=*
+      - MongoDbSettings__ConnectionString=mongodb://mymongodb:27017
+      - MongoDbSettings__DatabaseName=DLS
+      - RabbitMQSettings__HostName=rabbitmq
+      - RabbitMQSettings__UserName=user
+      - RabbitMQSettings__Password=password
+  mymongodb:
+    build:
+      context: ./DLS_Catalog_Service_3.0
+      dockerfile: Dockerfile.mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - app-network
+
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: password
+    ports:
+      - "5672:5672"     
+      - "15672:15672"   
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - app-network
+volumes:
+  db_data:
+  rabbitmq_data:
+  mongodb_data:
+    driver: local
+
+networks:
+  app-network:
+    driver: bridge
