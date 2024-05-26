@@ -1,0 +1,24 @@
+name: UniTest
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '7.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore DLS_Catalog_Service_3.0.sln
+
+    - name: Build
+      run: dotnet build DLS_Catalog_Service_3.0.sln --configuration Release
+
+    - name: Test
+      run: dotnet test DLS_Catalog_Service_3.0.Tests/DLS_Catalog_Service_3.0.Tests.csproj --configuration Release --logger "trx;LogFileName=test_results.trx" --filter FullyQualifiedName~UnitTest_Model.CategoryTests

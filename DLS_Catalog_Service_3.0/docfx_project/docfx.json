@@ -1,0 +1,45 @@
+{
+  "metadata": [
+    {
+      "src": [
+        {
+          "files": [
+            "DLS_Catalog_Service_3.0.csproj"
+          ],
+          "cwd": "../DLS_Catalog_Service_3.0"
+        }
+      ],
+      "dest": "api"
+    }
+  ],
+  "build": {
+    "content": [
+      {
+        "files": [
+          "api/**.yml",
+          "api/index.md"
+        ]
+      },
+      {
+        "files": [
+          "articles/**.md"
+        ],
+        "src": "articles"
+      },
+      {
+        "files": [
+          "*.md",
+          "toc.yml"
+        ]
+      }
+    ],
+    "dest": "_site",
+    "globalMetadata": {
+      "_enableSearch": true
+    },
+    "template": [
+      "default",
+      "statictoc"
+    ]
+  }
+}

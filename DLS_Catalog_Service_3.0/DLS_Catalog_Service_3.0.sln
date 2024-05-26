@@ -1,0 +1,41 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34031.279
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DLS_Catalog_Service_3.0", "DLS_Catalog_Service_3.0\DLS_Catalog_Service_3.0.csproj", "{4AAD17D4-7EB9-4FFC-9381-A9EF8C2C200C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution_Items", "Solution_Items", "{959AABDD-78B9-401F-85A2-5177676A2E7B}"
+	ProjectSection(SolutionItems) = preProject
+		docker-compose.yml = docker-compose.yml
+		Dockerfile.mongodb = Dockerfile.mongodb
+		rabbitmq.conf = rabbitmq.conf
+		seed.js = seed.js
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DLS_Catalog_Service_3.0.Tests", "DLS_Catalog_Service_3.0.Tests\DLS_Catalog_Service_3.0.Tests.csproj", "{A8A29243-61A2-441A-8CDC-89184E6D1920}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docfx_project", "docfx_project", "{1DD763AB-21DC-49ED-931B-AE0713B31421}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4AAD17D4-7EB9-4FFC-9381-A9EF8C2C200C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4AAD17D4-7EB9-4FFC-9381-A9EF8C2C200C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4AAD17D4-7EB9-4FFC-9381-A9EF8C2C200C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4AAD17D4-7EB9-4FFC-9381-A9EF8C2C200C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A8A29243-61A2-441A-8CDC-89184E6D1920}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A8A29243-61A2-441A-8CDC-89184E6D1920}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A8A29243-61A2-441A-8CDC-89184E6D1920}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A8A29243-61A2-441A-8CDC-89184E6D1920}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F42968BF-8BCA-4010-8E4D-882B9F48DBAC}
+	EndGlobalSection
+EndGlobal

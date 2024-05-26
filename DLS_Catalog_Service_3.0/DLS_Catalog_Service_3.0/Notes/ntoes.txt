@@ -1,0 +1,8 @@
+
+cd "D:/Top Up/Development of Large Systems/DLS_Catalog_Service_3.0"
+docker-compose down --rmi all // fjerner både containers og images
+docker system prune /slet alt
+docker-compose up --build -d // builder og starter
+
+
+
