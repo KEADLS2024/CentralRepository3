@@ -17,7 +17,7 @@ namespace UserService.Services
         private IModel _channel;
         private IConnection _connection;
         private readonly IServiceScopeFactory _scopeFactory;
-        private readonly string _hostname = "localhost";
+        private readonly string _hostname = "centralrepository3-rabbitmq-1";
         private readonly string _paymentQueueName = "paymentQueue";
         private readonly string _emailQueueName = "emailQueue"; // New queue for emails
 
@@ -29,7 +29,7 @@ namespace UserService.Services
 
         private void InitializeRabbitMQ()
         {
-            var factory = new ConnectionFactory() { HostName = _hostname };
+            var factory = new ConnectionFactory() { HostName = _hostname, UserName = "user", Password = "password"};
             _connection = factory.CreateConnection();
             _channel = _connection.CreateModel();
             _channel.QueueDeclare(queue: _paymentQueueName, durable: false, exclusive: false, autoDelete: false, arguments: null);

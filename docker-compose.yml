@@ -1,10 +1,25 @@
 version: '3.8'
 
 services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: password
+    ports:
+      - "5672:5672"     
+      - "15672:15672"   
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - app-network
   order-app:
     build:
       context: ./OrderService
       dockerfile: Dockerfile
+    depends_on:
+      - order-db
+      - rabbitmq
     ports:
       - "8080:80"
     environment:
@@ -58,22 +73,43 @@ services:
       - mongodb_data:/data/db
     networks:
       - app-network
-
-
-  rabbitmq:
-    image: rabbitmq:3-management
+  user-db:
+    image: mysql:8.0
+    container_name: my_mysql_db
     environment:
-      RABBITMQ_DEFAULT_USER: user
-      RABBITMQ_DEFAULT_PASS: password
+      MYSQL_ROOT_PASSWORD: "1234"
+      MYSQL_DATABASE: UserServiceDB
     ports:
-      - "5672:5672"     
-      - "15672:15672"   
+      - "3307:3306"
     volumes:
-      - rabbitmq_data:/var/lib/rabbitmq
+      - db_data1:/var/lib/mysql
+      - ./UserService/UserService/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - app-network
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  user-app:
+    build:
+      context: ./UserService/UserService
+      dockerfile: Dockerfile
+    depends_on:
+      - user-db
+      - rabbitmq
+    ports:
+      - "8060:80"
+    environment:
+      ConnectionStrings__DefaultConnection: "Server=my_mysql_db;Database=UserServiceDB;Uid=root;Pwd=1234;Port=3306;"
+    networks:
+      - app-network
+    restart: always
+
 volumes:
   db_data:
+  db_data1:
   rabbitmq_data:
   mongodb_data:
     driver: local
