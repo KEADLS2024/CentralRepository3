@@ -5,7 +5,6 @@ using UserService.Data;
 using UserService.Managers;
 using UserService.Interfaces;
 using UserService.Services;
-using Microsoft.Extensions.Configuration;
 
 
 
@@ -23,22 +22,12 @@ builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 builder.Logging.AddDebug();
 
-var configuration = builder.Configuration;
-var connectionString = configuration.GetConnectionString("MyDbConnection");
-
-// Log the connection string to verify it's being loaded
-Console.WriteLine($"Connection String: {connectionString}");
-
-// Configure DbContext with SQL Server
-builder.Services.AddDbContext<MyDbContext>(options =>
-    options.UseSqlServer(connectionString));
-
 
 
 // Register the DbContext with dependency injection to access the database context throughout the application.
-//builder.Services.AddDbContext<MyDbContext>(options =>
-//    options.UseMySql(builder.Configuration.GetConnectionString("MyDbConnection"),
-//        ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("MyDbConnection"))));
+builder.Services.AddDbContext<MyDbContext>(options =>
+    options.UseMySql(builder.Configuration.GetConnectionString("MyDbConnection"),
+        ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("MyDbConnection"))));
 
 // Register additional managers here
 
