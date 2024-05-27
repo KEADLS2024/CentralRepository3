@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert -o ./kubernetes/
+    kompose.version: 1.33.0 (3ce457399)
+  labels:
+    io.kompose.service: order-db
+  name: order-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: order-db
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert -o ./kubernetes/
+        kompose.version: 1.33.0 (3ce457399)
+      labels:
+        io.kompose.network/centralrepository3-app-network: "true"
+        io.kompose.service: order-db
+    spec:
+      containers:
+        - args:
+            - /bin/bash
+            - -c
+            - |
+              /opt/mssql/bin/sqlservr & sleep 30 && /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P 'Qwerty123!' -d master -i /docker-entrypoint-initdb.d/init.sql
+              wait
+          env:
+            - name: ACCEPT_EULA
+              value: "Y"
+            - name: SA_PASSWORD
+              value: Qwerty123!
+          image: mcr.microsoft.com/mssql/server:2019-latest
+          name: order-db
+          ports:
+            - containerPort: 1433
+              hostPort: 1433
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /var/opt/mssql
+              name: db-data
+            - mountPath: /docker-entrypoint-initdb.d/init.sql
+              name: order-db-cm1
+              subPath: init.sql
+      restartPolicy: Always
+      volumes:
+        - name: db-data
+          persistentVolumeClaim:
+            claimName: db-data
+        - configMap:
+            items:
+              - key: init.sql
+                path: init.sql
+            name: order-db-cm1
+          name: order-db-cm1

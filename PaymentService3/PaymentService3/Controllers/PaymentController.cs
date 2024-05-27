@@ -87,12 +87,12 @@ namespace PaymentService3.Controllers
         /// <param name="customerId">Kunde-id, der skal sendes til køen.</param>
         private void SendCustomerIdToQueue(string customerId)
         {
-            var factory = new ConnectionFactory() { HostName = "localhost" }; // Opdater til din RabbitMQ-serveradresse
+            var factory = new ConnectionFactory() { HostName = "centralrepository3-rabbitmq-1", UserName = "user", Password = "password" }; // Opdater til din RabbitMQ-serveradresse
 
             using (var connection = factory.CreateConnection())
             using (var channel = connection.CreateModel())
             {
-                channel.QueueDeclare(queue: "paymentQueue",
+                channel.QueueDeclare(queue: "paymentQueueTest",
                     durable: false,
                     exclusive: false,
                     autoDelete: false,
