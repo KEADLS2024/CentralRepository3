@@ -83,7 +83,7 @@ services:
       - "3307:3306"
     volumes:
       - db_data1:/var/lib/mysql
-      - ./UserService/UserService/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./UserService/UserService/init.sql:/docker-entrypoint-initdb.d/init-user.sql
     networks:
       - app-network
     restart: always
@@ -92,6 +92,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    entrypoint: ["sh", "-c", "docker-entrypoint.sh mysqld & sleep 30 && mysql -uroot -p1234 UserServiceDB < /docker-entrypoint-initdb.d/init-user.sql && wait"]
   user-app:
     build:
       context: ./UserService/UserService
@@ -106,6 +107,14 @@ services:
     networks:
       - app-network
     restart: always
+  email-app:
+    build:
+      context: ./EmailService
+      dockerfile: ./EmailService/Dockerfile
+    depends_on:
+      - rabbitmq
+    networks:
+      - app-network
 
 volumes:
   db_data:

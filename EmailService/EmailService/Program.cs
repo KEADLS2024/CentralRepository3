@@ -1,31 +1,43 @@
-﻿using RabbitMQ.Client;
-using RabbitMQ.Client.Events;
-using System;
-using System.Net.Mail;
-using System.Text;
+﻿using System.Net.Mail;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+
+namespace EmailService;
 
 class Program
 {
     static void Main(string[] args)
     {
-        var factory = new ConnectionFactory() { HostName = "localhost" };
-        using var connection = factory.CreateConnection();
-        using var channel = connection.CreateModel();
+        var rabbitMqHelper = new RabbitMqHelper("centralrepository3-rabbitmq-1", "user", "password");
+        CreateHostBuilder(args).Build().Run();
 
-        channel.QueueDeclare(queue: "emailQueue", durable: false, exclusive: false, autoDelete: false, arguments: null);
-
-        var consumer = new EventingBasicConsumer(channel);
-        consumer.Received += (model, ea) =>
-        {
-            var email = Encoding.UTF8.GetString(ea.Body.ToArray());
-            Console.WriteLine($"Received email to send to: {email}");
-            SendConfirmationEmail(email);
-        };
-
-        channel.BasicConsume(queue: "emailQueue", autoAck: true, consumer: consumer);
+        rabbitMqHelper.Receive("emailQueue", SendConfirmationEmail);
 
         Console.WriteLine("Press [enter] to exit.");
         Console.ReadLine();
+
+        
+
+        rabbitMqHelper.Close();
+
+        //var factory = new ConnectionFactory() { HostName = "centralrepository3-rabbitmq-1", UserName = "user", Password = "password" };
+        //using var connection = factory.CreateConnection();
+        //using var channel = connection.CreateModel();
+
+        ////channel.QueueDeclare(queue: "emailQueue", durable: false, exclusive: false, autoDelete: false, arguments: null);
+
+        //var consumer = new EventingBasicConsumer(channel);
+        //consumer.Received += (model, ea) =>
+        //{
+        //    var email = Encoding.UTF8.GetString(ea.Body.ToArray());
+        //    Console.WriteLine($"Received email to send to: {email}");
+        //    SendConfirmationEmail(email);
+        //};
+
+        //channel.BasicConsume(queue: "emailQueue", autoAck: true, consumer: consumer);
+
+        //Console.WriteLine("Press [enter] to exit.");
+        //Console.ReadLine();
     }
 
     static void SendConfirmationEmail(string email)
@@ -57,4 +69,10 @@ class Program
 
 
     }
+    public static IHostBuilder CreateHostBuilder(string[] args) =>
+        Host.CreateDefaultBuilder(args)
+            .ConfigureServices((hostContext, services) =>
+            {
+                services.AddHostedService<EmailSenderService>();
+            });
 }
