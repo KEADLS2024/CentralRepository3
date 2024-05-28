@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   rabbitmq:
     image: rabbitmq:3-management
@@ -7,12 +5,13 @@ services:
       RABBITMQ_DEFAULT_USER: user
       RABBITMQ_DEFAULT_PASS: password
     ports:
-      - "5672:5672"     
-      - "15672:15672"   
+      - "5672:5672"
+      - "15672:15672"
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     networks:
       - app-network
+
   order-app:
     build:
       context: ./OrderService
@@ -23,9 +22,10 @@ services:
     ports:
       - "8080:80"
     environment:
-      - ConnectionStrings__DefaultConnection=Server=centralrepository3-order-db-1;Database=OrderServiceDB;User=sa;Password=Qwerty123!;TrustServerCertificate=True;
+      - ConnectionStrings__DefaultConnection=Server=order-db;Database=OrderServiceDB;User=sa;Password=Qwerty123!;TrustServerCertificate=True;
     networks:
       - app-network
+
   order-db:
     image: mcr.microsoft.com/mssql/server:2019-latest
     environment:
@@ -44,6 +44,7 @@ services:
         wait
     networks:
       - app-network
+
   catalog-app:
     build:
       context: ./DLS_Catalog_Service_3.0/DLS_Catalog_Service_3.0
@@ -63,6 +64,7 @@ services:
       - RabbitMQSettings__HostName=rabbitmq
       - RabbitMQSettings__UserName=user
       - RabbitMQSettings__Password=password
+
   mymongodb:
     build:
       context: ./DLS_Catalog_Service_3.0
@@ -73,6 +75,7 @@ services:
       - mongodb_data:/data/db
     networks:
       - app-network
+
   user-db:
     image: mysql:8.0
     container_name: my_mysql_db
@@ -93,6 +96,7 @@ services:
       timeout: 5s
       retries: 5
     entrypoint: ["sh", "-c", "docker-entrypoint.sh mysqld & sleep 30 && mysql -uroot -p1234 UserServiceDB < /docker-entrypoint-initdb.d/init-user.sql && wait"]
+
   user-app:
     build:
       context: ./UserService/UserService
@@ -107,16 +111,16 @@ services:
     networks:
       - app-network
     restart: always
+
   email-app:
     build:
       context: ./EmailService
       dockerfile: ./EmailService/Dockerfile
     depends_on:
       - rabbitmq
-    ports:
-      - "8040:80"
     networks:
       - app-network
+
   payment-app:
     build:
       context: ./PaymentService3
@@ -129,11 +133,59 @@ services:
       - app-network
     restart: always
 
+  aggregator-service:
+    build:
+      context: ./AggregatorService/AggregatorService
+      dockerfile: Dockerfile
+    depends_on:
+      - rabbitmq
+      - order-app
+    networks:
+      - app-network
+    ports:
+      - "8090:80"
+    environment:
+      - RabbitMQSettings__HostName=rabbitmq
+      - RabbitMQSettings__UserName=user
+      - RabbitMQSettings__Password=password
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.10.1
+    container_name: elasticsearch
+    environment:
+      - node.name=elasticsearch
+      - cluster.name=docker-cluster
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    networks:
+      - app-network
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.10.1
+    container_name: kibana
+    environment:
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    networks:
+      - app-network
+
 volumes:
   db_data:
   db_data1:
   rabbitmq_data:
   mongodb_data:
+  esdata:
     driver: local
 
 networks:

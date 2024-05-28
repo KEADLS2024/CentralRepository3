@@ -6,3 +6,4 @@ docker-compose up --build -d // builder og starter
 
 
 
+http://localhost:8070/api/Categories 
