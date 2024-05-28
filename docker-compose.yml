@@ -106,11 +106,10 @@ services:
     depends_on:
       - user-db
       - rabbitmq
-      - elasticsearch
     ports:
       - "8060:80"
     environment:
-      - ConnectionStrings__DefaultConnection=Server=my_mysql_db;Database=UserServiceDB;Uid=root;Pwd=1234;Port=3306;
+      ConnectionStrings__DefaultConnection: "Server=my_mysql_db;Database=UserServiceDB;Uid=root;Pwd=1234;Port=3306;"
     networks:
       - app-network
     restart: always
@@ -121,8 +120,6 @@ services:
       dockerfile: ./EmailService/Dockerfile
     depends_on:
       - rabbitmq
-    ports:
-      - "8040:80"
     networks:
       - app-network
 
@@ -138,46 +135,29 @@ services:
       - app-network
     restart: always
 
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.10.1
-    container_name: elasticsearch
-    environment:
-      - node.name=elasticsearch
-      - cluster.name=docker-cluster
-      - discovery.type=single-node
-      - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-    volumes:
-      - esdata1:/usr/share/elasticsearch/data
-    ports:
-      - "9200:9200"
-      - "9300:9300"
+  aggregator-service:
+    build:
+      context: ./AggregatorService/AggregatorService
+      dockerfile: Dockerfile
+    depends_on:
+      - rabbitmq
+      - order-app
     networks:
       - app-network
-
-  kibana:
-    image: docker.elastic.co/kibana/kibana:7.10.1
-    container_name: kibana
-    environment:
-      ELASTICSEARCH_URL: http://elasticsearch:9200
     ports:
-      - "5601:5601"
-    networks:
-      - app-network
+      - "8090:80"
+    environment:
+      - RabbitMQSettings__HostName=rabbitmq
+      - RabbitMQSettings__UserName=user
+      - RabbitMQSettings__Password=password
 
 volumes:
   db_data:
   db_data1:
   rabbitmq_data:
   mongodb_data:
-  esdata1:
+    driver: local
 
 networks:
   app-network:
     driver: bridge
-
-
