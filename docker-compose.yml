@@ -137,10 +137,11 @@ services:
 
   aggregator-service:
     build:
-      context: ./AggregatorService
+      context: ./AggregatorService/AggregatorService
       dockerfile: Dockerfile
     depends_on:
       - rabbitmq
+      - order-app
     networks:
       - app-network
     ports:

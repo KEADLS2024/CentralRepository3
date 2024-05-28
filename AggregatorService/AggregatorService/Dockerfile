@@ -5,10 +5,10 @@ EXPOSE 80
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
-COPY ["AggregatorService/AggregatorService.csproj", "AggregatorService/"]
-RUN dotnet restore "AggregatorService/AggregatorService.csproj"
+COPY ["AggregatorService.csproj", "./"]
+RUN dotnet restore "AggregatorService.csproj"
 COPY . .
-WORKDIR "/src/AggregatorService"
+WORKDIR "/src"
 RUN dotnet build "AggregatorService.csproj" -c Release -o /app/build
 
 FROM build AS publish
