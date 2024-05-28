@@ -22,7 +22,7 @@ spec:
         io.kompose.service: email-app
     spec:
       containers:
-        - image: email-app
+        - image: simonlindegaardm/centralrepository3-email-app
           name: email-app
           ports:
             - containerPort: 80

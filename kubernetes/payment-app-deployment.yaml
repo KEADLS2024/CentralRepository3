@@ -22,7 +22,7 @@ spec:
         io.kompose.service: payment-app
     spec:
       containers:
-        - image: payment-app
+        - image: simonlindegaardm/centralrepository3-payment-app
           name: payment-app
           ports:
             - containerPort: 80

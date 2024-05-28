@@ -23,9 +23,17 @@ spec:
     spec:
       containers:
         - env:
+            - name: AllowedHosts
+              value: '*'
             - name: ConnectionStrings__DefaultConnection
-              value: Server=centralrepository3-order-db-1;Database=OrderServiceDB;User=sa;Password=Qwerty123!;TrustServerCertificate=True;
-          image: order-app
+              value: Server=order-db;Database=OrderServiceDB;User=sa;Password=Qwerty123!;TrustServerCertificate=True;
+            - name: RabbitMQ__HostName
+              value: rabbitmq
+            - name: RabbitMQ__Password
+              value: password
+            - name: RabbitMQ__UserName
+              value: user
+          image: simonlindegaardm/centralrepository3-order-app
           name: order-app
           ports:
             - containerPort: 80

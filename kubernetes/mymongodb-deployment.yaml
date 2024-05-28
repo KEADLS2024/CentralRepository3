@@ -24,7 +24,7 @@ spec:
         io.kompose.service: mymongodb
     spec:
       containers:
-        - image: mymongodb
+        - image: simonlindegaardm/centralrepository3-mymongodb
           name: mymongodb
           ports:
             - containerPort: 27017

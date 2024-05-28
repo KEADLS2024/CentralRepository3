@@ -25,7 +25,7 @@ spec:
         - env:
             - name: ConnectionStrings__DefaultConnection
               value: Server=my_mysql_db;Database=UserServiceDB;Uid=root;Pwd=1234;Port=3306;
-          image: user-app
+          image: simonlindegaardm/centralrepository3-user-app
           name: user-app
           ports:
             - containerPort: 80

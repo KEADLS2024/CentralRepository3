@@ -35,7 +35,7 @@ spec:
               value: password
             - name: RabbitMQSettings__UserName
               value: user
-          image: catalog-app
+          image: simonlindegaardm/centralrepository3-catalog-app
           name: catalog-app
           ports:
             - containerPort: 80
